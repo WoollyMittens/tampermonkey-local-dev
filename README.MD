@@ -12,7 +12,7 @@ Available [TamperMonkey](https://www.tampermonkey.net/) extentions:
 
 ## 2. Configure the script
 
-Download the example tampermonkey.js script from [this repository](https://github.com/WoollyMittens/tampermonkey-localdev/blob/master/tampermonkey.js).
+Download the example "[tampermonkey.js](https://raw.githubusercontent.com/WoollyMittens/tampermonkey-local-dev/master/tampermonkey.js)" script from [this repository](https://github.com/WoollyMittens/tampermonkey-local-dev).
 
 ### Fill in the project information
 
@@ -51,8 +51,6 @@ Or if you have configured the project in MAMP something like:
 Try variations of the URL out in your browser to find out the correct one.
 
 ### Fill in the local path
-
-Download the example [tampermonkey.js](https://raw.githubusercontent.com/WoollyMittens/tampermonkey-local-dev/master/tampermonkey.js) file.
 
 Edit the following constants in the "tampermonkey.js" to reflect your localhost:
 
