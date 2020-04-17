@@ -88,7 +88,7 @@ Paste and save your modified "tampermonkey.js" in the editor:
 
 ![Save the script](images/3_save_the_script.png)
 
-The script will new appear as active in the list:
+The new script will now appear as active in the list:
 
 ![Use the script](images/4_use_the_script.png)
 
