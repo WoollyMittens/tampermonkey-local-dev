@@ -108,7 +108,7 @@ Refresh the browser or press ~ to see you changes on the live site:
 
 ## Troubleshooting
 
-- If the browser refuses to load the new assets, it can sometimes help to add this [.htaccess](.htaccess) file to your localhost folder.
+- If the browser refuses to load the new assets, it can sometimes help to add this [.htaccess](.htaccess) file to your localhost folder:
 
 ```
 Header set Access-Control-Allow-Origin "*"
@@ -122,6 +122,6 @@ Header set Access-Control-Allow-Headers "Content-Type, Authorization"
 
 ```
 
-- If you get a 403 forbidden error on a particular folder on your localhost, set this override (on just your localhost folder) in MAMP:
+- If you get a 403 forbidden error on a particular folder on your localhost, set this override in MAMP:
 
 ![Allow localhost](images/8_allow_localhost.png)
