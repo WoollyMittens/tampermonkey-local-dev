@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PROJECT_NAME
 // @namespace    http://tampermonkey.net/
-// @version      0.4
+// @version      0.5
 // @description  Insert custom CSS and JS
 // @author       maurice.vancreij@webqem.com
 // @match        https://*.PROJECT_WEBSITE.com/*
@@ -12,12 +12,19 @@
 
   'use strict';
 
+  // PROPERTIES
+
   const localUrl = 'http://localhost/PATH_TO_THE_LOCAL_FILES/';
-  const stylesHref = 'css/styles.less';
-  const scriptSrc = 'js/scripts.js';
+  const styleUrls = ['css/styles.less'];
+  const scriptUrls = ['js/scripts.js'];
   const removeThese = 'link[href*="existing.css"]';
 
-  function removeStyles() {
+  // METHODS
+
+  function removeAssets() {
+    // stop if there's nothing to remove
+    if (!removeThese) return null;
+    // remove all matched assets
     var oldAssets = document.querySelectorAll(removeThese);
     for (var a = 0, b = oldAssets.length; a < b; a += 1) {
       oldAssets[a].parentNode.removeChild(oldAssets[a]);
@@ -32,56 +39,68 @@
     document.getElementsByTagName('head')[0].appendChild(Less);
   };
 
-  function createStyles() {
+  function createStyle(href) {
     // generate a replacement stylesheet
     var link = document.createElement('link');
-    link.setAttribute('rel', (/.less/.test(stylesHref)) ? 'stylesheet/less' : 'stylesheet');
+    link.setAttribute('rel', (/.less/.test(href)) ? 'stylesheet/less' : 'stylesheet');
     link.setAttribute('type', 'text/css');
-    link.setAttribute('href', localUrl + stylesHref + '?t=' + new Date().getTime());
+    link.setAttribute('href', localUrl + href + '?t=' + new Date().getTime());
     // return a reference
     return link;
   };
 
-  function createScripts() {
+  function createScript(src) {
     // generate a replacement script block
     var script = document.createElement('script');
     script.setAttribute('type', 'text/javascript');
-    script.setAttribute('src', localUrl + scriptSrc + '?t=' + new Date().getTime());
+    script.setAttribute('src', localUrl + src + '?t=' + new Date().getTime());
     // return a reference
     return script;
   };
 
-  function resetIncludes() {
-    // replace the stylesheet
-    var stylesReplacement = createStyles();
-    stylesInclude.parentNode.replaceChild(stylesReplacement, stylesInclude);
-    stylesInclude = stylesReplacement;
-    // compile Less if nessecary
-    if (/.less/.test(stylesHref)) compileLess();
-    // optionally replace the script
-    if (!scriptSrc) return null;
-    var scriptReplacement = createScripts();
-    scriptInclude.parentNode.replaceChild(scriptReplacement, scriptInclude);
-    scriptInclude = scriptReplacement;
+  function resetStyles() {
+    var href, style, existing;
+    // for all stylesheets
+    for (var a = 0, b = styleUrls.length; a < b; a += 1) {
+      href = styleUrls[a];
+      // create the new include
+      style = createStyle(href);
+      // find a possible existing one
+      existing = document.querySelector('link[href*="' + href + '"]');
+      // replace or insert the include
+      if (existing) { existing.parentNode.replaceChild(style, existing) }
+      else { document.getElementsByTagName('head')[0].appendChild(style) };
+    }
+    // compile any less includes
+    if (/.less/.test(styleUrls.join(','))) compileLess();
   };
 
-  // define starting value of existing includes, or insert new ones
-  var stylesInclude = document.querySelector('link[href*="' + stylesHref + '"]') || document.getElementsByTagName('head')[0].appendChild(createStyles());
-  var scriptInclude = document.querySelector('script[src*="' + scriptSrc + '"]') || document.getElementsByTagName('head')[0].appendChild(createScripts());
+  function resetScripts() {
+    var src, script;
+    // for all stylesheets
+    for (var a = 0, b = scriptUrls.length; a < b; a += 1) {
+      src = scriptUrls[a];
+      // create the new include
+      script = createScript(src);
+      // insert the include
+      document.getElementsByTagName('head')[0].appendChild(script);
+    }
+  };
 
-  // start the process
-
-  if (removeThese) removeStyles();
-
-  resetIncludes();
+  // EVENTS
 
   window.addEventListener('keyup', function(evt) {
     if (evt.key === '`') {
       // reload the page in case of less compilation
-      if (/.less/.test(stylesHref)) document.location.reload();
+      if (/.less/.test(styleUrls)) document.location.reload();
       // re-apply the includes
-      resetIncludes();
+      resetStyles();
+      resetScripts();
     }
   });
+
+  removeAssets();
+  resetStyles();
+  resetScripts();
 
 })();

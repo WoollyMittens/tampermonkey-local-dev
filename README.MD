@@ -56,8 +56,8 @@ Edit the following constants in the "tampermonkey.js" to reflect your localhost:
 
 ```javascript
 const localUrl = 'http://localhost/PATH_TO_THE_LOCAL_FILES/';
-const stylesHref = 'css/styles.less';
-const scriptSrc = 'js/scripts.js';
+const styleUrls = ['css/styles.less'];
+const scriptUrls = ['js/scripts.js'];
 const removeThese = 'link[href*="existing.css"]';
 ```
 
@@ -65,8 +65,8 @@ It this case it would be:
 
 ```javascript
 const localUrl = 'http://localhost/~mauricevancreij/Sites/project-repository/';
-const stylesHref = 'theme/styles.css';
-const scriptSrc = null;
+const styleUrls = ['theme/styles.css'];
+const scriptUrls = null;
 const removeThese = null;
 ```
 
