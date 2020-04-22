@@ -65,9 +65,9 @@ const compileFirst = true;
 In the simple case of changing existing styles in a local repository:
 
 ```javascript
-const localUrl = 'http://localhost/Projects/sydneytrainwalks-website/inc/';
-const removeThese = 'link[href*="styles.css"]';
-const styleIncludes = ['css/styles.css'];
+const localUrl = 'http://localhost/local-project-repo/';
+const removeThese = 'link[href*="theme.min.css"]';
+const styleIncludes = ['styles/theme.less'];
 const scriptIncludes = [];
 const compileFirst = false;
 ```
@@ -75,7 +75,7 @@ const compileFirst = false;
 Or the advanced case of additional components that need to be compiled first:
 
 ```javascript
-const localUrl = 'http://localhost/Tampermonkey/tampermonkey-local-dev/';
+const localUrl = 'http://localhost/tampermonkey-local-dev/';
 const removeThese = null;
 const styleIncludes = ['less/styles.less'];
 const scriptIncludes = ['js/scripts.js'];

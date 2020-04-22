@@ -18,7 +18,8 @@
   const removeThese = 'link[href*="existing.css"]';
   const styleIncludes = ['less/styles.less'];
   const scriptIncludes = ['js/scripts.js'];
-  const compileFirst = true;
+  const compileBefore = true;
+  const compileAfter = (!compileBefore && /.less/.test(styleIncludes.join(',')));
 
   // METHODS
 
@@ -32,14 +33,22 @@
     }
   };
 
+  function compileLess() {
+    // insert on the fly Less compilation
+    var Less = document.createElement('script');
+    Less.setAttribute('type', 'text/javascript');
+    Less.setAttribute('src', '//cdnjs.cloudflare.com/ajax/libs/less.js/3.9.0/less.min.js');
+    document.getElementsByTagName('head')[0].appendChild(Less);
+  };
+
   function createStyle(path) {
-    var href = (compileFirst ? localUrl + 'php/{type}.php?path=../{path}&t={t}' : localUrl + '{path}?t={t}')
+    var href = (compileBefore ? localUrl + 'php/{type}.php?path=../{path}&t={t}' : localUrl + '{path}?t={t}')
       .replace('{type}', path.split('.').pop())
       .replace('{path}', path)
       .replace('{t}', new Date().getTime());
     // generate a replacement stylesheet
     var link = document.createElement('link');
-    link.setAttribute('rel', 'stylesheet');
+    link.setAttribute('rel', (compileAfter) ? 'stylesheet/less' : 'stylesheet');
     link.setAttribute('type', 'text/css');
     link.setAttribute('href', href);
     // return a reference
@@ -47,7 +56,7 @@
   };
 
   function createScript(path) {
-    var src = (compileFirst ? localUrl + 'php/{type}.php?path=../{path}&t={t}' : localUrl + '{path}?t={t}')
+    var src = (compileBefore ? localUrl + 'php/{type}.php?path=../{path}&t={t}' : localUrl + '{path}?t={t}')
       .replace('{type}', path.split('.').pop())
       .replace('{path}', path)
       .replace('{t}', new Date().getTime());
@@ -72,6 +81,8 @@
       if (existing) { existing.parentNode.replaceChild(style, existing) }
       else { document.getElementsByTagName('head')[0].appendChild(style) };
     }
+    // if any of the files where LESS
+    if (compileAfter) compileLess();
   };
 
   function resetScripts() {
@@ -90,6 +101,8 @@
 
   window.addEventListener('keyup', function(evt) {
     if (evt.key === '`') {
+      // reload the page if on the fly less compilation was used
+      if (compileAfter) { document.location.reload(); return null; }
       // re-apply the includes
       resetStyles();
       resetScripts();
