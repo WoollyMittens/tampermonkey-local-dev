@@ -65,7 +65,7 @@ const compileFirst = true;
 In the simple case of changing existing styles in a local repository:
 
 ```javascript
-const localUrl = 'http://localhost/local-project-repo/';
+const localUrl = 'http://localhost/project-repository/';
 const removeThese = 'link[href*="theme.min.css"]';
 const styleIncludes = ['styles/theme.less'];
 const scriptIncludes = [];
