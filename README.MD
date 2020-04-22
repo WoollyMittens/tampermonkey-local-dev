@@ -38,15 +38,15 @@ Turn on [MAMP](https://www.mamp.info/en/downloads/), [Docker](https://www.docker
 
 If the path to the stylesheet on your harddrive is:
 
-    /Users/mauricevancreij/Sites/project-repository/theme/styles/styles.css
+    /Users/USERNAME/Sites/project-repository/styles/theme.min.css
 
 then the url will typicaly be something like:
 
-    http://localhost/~mauricevancreij/Sites/project-repository/theme/styles.css
+    http://localhost/project-repository/styles/theme.min.css
 
 Or if you have configured the project in MAMP something like:
 
-    http://project.local/theme/styles.css
+    http://project.local/styles/theme.min.css
 
 Try variations of the URL out in your browser to find out the correct one.
 
