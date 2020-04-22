@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PROJECT_NAME
 // @namespace    http://tampermonkey.net/
-// @version      0.5
+// @version      0.6
 // @description  Insert custom CSS and JS
 // @author       maurice.vancreij@webqem.com
 // @match        https://*.PROJECT_WEBSITE.com/*
@@ -14,10 +14,11 @@
 
   // PROPERTIES
 
-  const localUrl = 'http://localhost/PATH_TO_THE_LOCAL_FILES/';
-  const styleUrls = ['css/styles.less'];
-  const scriptUrls = ['js/scripts.js'];
+  const localUrl = 'http://localhost/PATH_TO_THIS_FOLDER/';
   const removeThese = 'link[href*="existing.css"]';
+  const styleIncludes = ['less/styles.less'];
+  const scriptIncludes = ['js/scripts.js'];
+  const compileFirst = true;
 
   // METHODS
 
@@ -31,29 +32,29 @@
     }
   };
 
-  function compileLess() {
-    // insert on the fly Less compilation
-    var Less = document.createElement('script');
-    Less.setAttribute('type', 'text/javascript');
-    Less.setAttribute('src', '//cdnjs.cloudflare.com/ajax/libs/less.js/3.9.0/less.min.js');
-    document.getElementsByTagName('head')[0].appendChild(Less);
-  };
-
-  function createStyle(href) {
+  function createStyle(path) {
+    var href = (compileFirst ? localUrl + 'php/{type}.php?path=../{path}&t={t}' : localUrl + '{path}?t={t}')
+      .replace('{type}', path.split('.').pop())
+      .replace('{path}', path)
+      .replace('{t}', new Date().getTime());
     // generate a replacement stylesheet
     var link = document.createElement('link');
-    link.setAttribute('rel', (/.less/.test(href)) ? 'stylesheet/less' : 'stylesheet');
+    link.setAttribute('rel', 'stylesheet');
     link.setAttribute('type', 'text/css');
-    link.setAttribute('href', localUrl + href + '?t=' + new Date().getTime());
+    link.setAttribute('href', href);
     // return a reference
     return link;
   };
 
-  function createScript(src) {
+  function createScript(path) {
+    var src = (compileFirst ? localUrl + 'php/{type}.php?path=../{path}&t={t}' : localUrl + '{path}?t={t}')
+      .replace('{type}', path.split('.').pop())
+      .replace('{path}', path)
+      .replace('{t}', new Date().getTime());
     // generate a replacement script block
     var script = document.createElement('script');
     script.setAttribute('type', 'text/javascript');
-    script.setAttribute('src', localUrl + src + '?t=' + new Date().getTime());
+    script.setAttribute('src', src);
     // return a reference
     return script;
   };
@@ -61,8 +62,8 @@
   function resetStyles() {
     var href, style, existing;
     // for all stylesheets
-    for (var a = 0, b = styleUrls.length; a < b; a += 1) {
-      href = styleUrls[a];
+    for (var a = 0, b = styleIncludes.length; a < b; a += 1) {
+      href = styleIncludes[a];
       // create the new include
       style = createStyle(href);
       // find a possible existing one
@@ -71,15 +72,13 @@
       if (existing) { existing.parentNode.replaceChild(style, existing) }
       else { document.getElementsByTagName('head')[0].appendChild(style) };
     }
-    // compile any less includes
-    if (/.less/.test(styleUrls.join(','))) compileLess();
   };
 
   function resetScripts() {
     var src, script;
     // for all stylesheets
-    for (var a = 0, b = scriptUrls.length; a < b; a += 1) {
-      src = scriptUrls[a];
+    for (var a = 0, b = scriptIncludes.length; a < b; a += 1) {
+      src = scriptIncludes[a];
       // create the new include
       script = createScript(src);
       // insert the include
@@ -91,8 +90,6 @@
 
   window.addEventListener('keyup', function(evt) {
     if (evt.key === '`') {
-      // reload the page in case of less compilation
-      if (/.less/.test(styleUrls)) document.location.reload();
       // re-apply the includes
       resetStyles();
       resetScripts();

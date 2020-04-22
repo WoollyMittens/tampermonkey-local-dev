@@ -56,23 +56,31 @@ Edit the following constants in the "tampermonkey.js" to reflect your localhost:
 
 ```javascript
 const localUrl = 'http://localhost/PATH_TO_THE_LOCAL_FILES/';
-const styleUrls = ['css/styles.less'];
-const scriptUrls = ['js/scripts.js'];
 const removeThese = 'link[href*="existing.css"]';
+const styleIncludes = ['less/styles.less'];
+const scriptIncludes = ['js/scripts.js'];
+const compileFirst = true;
 ```
 
-It this case it would be:
+In the simple case of changing existing styles in a local repository:
 
 ```javascript
-const localUrl = 'http://localhost/~mauricevancreij/Sites/project-repository/';
-const styleUrls = ['theme/styles.css'];
-const scriptUrls = null;
-const removeThese = null;
+const localUrl = 'http://localhost/Projects/sydneytrainwalks-website/inc/';
+const removeThese = 'link[href*="styles.css"]';
+const styleIncludes = ['css/styles.css'];
+const scriptIncludes = [];
+const compileFirst = false;
 ```
 
-<sub>* Advanced: Additional javascript can also be loaded into the live site if the "scriptSrc" is filled in.</sub>
+Or the advanced case of additional components that need to be compiled first:
 
-<sup>** More advanced: If existing stylesheets need to be removed first, fill in "const removeThese" to match them.</sup>
+```javascript
+const localUrl = 'http://localhost/Tampermonkey/tampermonkey-local-dev/';
+const removeThese = null;
+const styleIncludes = ['less/styles.less'];
+const scriptIncludes = ['js/scripts.js'];
+const compileFirst = true;
+```
 
 ### Load the script into the browser extension
 
