@@ -121,7 +121,7 @@
       htmlRequest = new XMLHttpRequest();
       htmlContainer = document.querySelector(htmlIncludes[a].container);
       htmlRequest.addEventListener("load", htmlResolver.bind(this, htmlContainer));
-      htmlRequest.open("GET", localUrl + htmlIncludes[a].url);
+      htmlRequest.open("GET", localUrl + htmlIncludes[a].url + '?t=' + new Date().getTime());
       htmlRequest.send();
     }
   };
