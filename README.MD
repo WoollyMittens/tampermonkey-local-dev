@@ -22,7 +22,7 @@ In the top of the file edit the @name of your project and @match the domain of t
 // ==UserScript==
 // @name         PROJECT_NAME
 // @namespace    http://tampermonkey.net/
-// @version      0.3
+// @version      0.7.3
 // @description  Insert custom CSS and JS
 // @author       maurice.vancreij@webqem.com
 // @match        https://*.PROJECT_WEBSITE.com/*
@@ -59,6 +59,15 @@ const localUrl = 'http://localhost/PATH_TO_THE_LOCAL_FILES/';
 const removeThese = 'link[href*="existing.css"]';
 const styleIncludes = ['less/styles.less'];
 const scriptIncludes = ['js/scripts.js'];
+const htmlIncludes = [{
+  'url': 'html/component.html',
+  'container': '#container'
+}];
+const webfontIncludes = [
+  'https://use.typekit.net/TYPEKIT_FONTS.css',
+  'https://fonts.googleapis.com/css?family=GOOGLE_FONTS',
+  'https://kit.fontawesome.com/ICON_FONT.js'
+];
 const compileFirst = true;
 ```
 
@@ -69,16 +78,20 @@ const localUrl = 'http://localhost/project-repository/';
 const removeThese = 'link[href*="theme.min.css"]';
 const styleIncludes = ['styles/theme.less'];
 const scriptIncludes = [];
+const htmlIncludes = [];
+const webfontIncludes = [];
 const compileFirst = false;
 ```
 
-Or the advanced case of additional components that need to be compiled first:
+Or the advanced case of additional components that need to be compiled and/or inserted first:
 
 ```javascript
 const localUrl = 'http://localhost/tampermonkey-local-dev/';
 const removeThese = null;
-const styleIncludes = ['less/styles.less'];
-const scriptIncludes = ['js/scripts.js'];
+const styleIncludes = ['less/local.less'];
+const scriptIncludes = ['js/local.js'];
+const htmlIncludes = [{'url': 'html/local.html', 'container': '#container'}];
+const webfontIncludes = ['https://kit.fontawesome.com/8254db13d2.js'];
 const compileFirst = true;
 ```
 

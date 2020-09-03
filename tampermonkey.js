@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PROJECT_NAME
 // @namespace    http://tampermonkey.net/
-// @version      0.6
+// @version      0.7.3
 // @description  Insert custom CSS and JS
 // @author       maurice.vancreij@webqem.com
 // @match        https://*.PROJECT_WEBSITE.com/*
@@ -12,12 +12,26 @@
 
   'use strict';
 
+  // CONDITIONS
+
+  if (/admin/.test(document.location.href)){ return false; }
+  else { window.tampered = true; }
+
   // PROPERTIES
 
   const localUrl = 'http://localhost/PATH_TO_THIS_FOLDER/';
   const removeThese = 'link[href*="existing.css"]';
   const styleIncludes = ['less/styles.less'];
   const scriptIncludes = ['js/scripts.js'];
+  const htmlIncludes = [{
+    'url': 'html/component.html',
+    'container': '#container'
+  }];
+  const webfontIncludes = [
+    'https://use.typekit.net/TYPEKIT_FONTS.css',
+    'https://fonts.googleapis.com/css?family=GOOGLE_FONTS',
+    'https://kit.fontawesome.com/ICON_FONT.js'
+  ];
   const compileBefore = true;
   const compileAfter = (!compileBefore && /.less/.test(styleIncludes.join(',')));
 
@@ -97,6 +111,47 @@
     }
   };
 
+  function resetHtml() {
+    var htmlRequest;
+    var htmlContainer;
+    var htmlResolver = function(container, evt) { container.innerHTML = evt.target.responseText; };
+    // for all html includes
+    for (var a = 0, b = htmlIncludes.length; a < b; a += 1) {
+      // fetch the component
+      htmlRequest = new XMLHttpRequest();
+      htmlContainer = document.querySelector(htmlIncludes[a].container);
+      htmlRequest.addEventListener("load", htmlResolver.bind(this, htmlContainer));
+      htmlRequest.open("GET", localUrl + htmlIncludes[a].url);
+      htmlRequest.send();
+    }
+  };
+
+  function resetFonts() {
+    var include;
+    // for all webfonts
+    for (var a = 0, b = webfontIncludes.length; a < b; a += 1) {
+      // generate a js or a css include
+      if (/.js/.test(webfontIncludes[a])) {
+        include = document.createElement('script');
+        include.setAttribute('type', 'text/javascript');
+        include.setAttribute('crossorigin', 'anonymous');
+        include.setAttribute('src', webfontIncludes[a]);
+      }
+      else {
+        include = document.createElement('link');
+        include.setAttribute('rel', 'stylesheet');
+        include.setAttribute('type', 'text/css');
+        include.setAttribute('href', webfontIncludes[a]);
+      }
+      // insert in the header
+      document.getElementsByTagName('head')[0].appendChild(include);
+    }
+  };
+
+  function runTests() {
+    // custom tests
+  };
+
   // EVENTS
 
   window.addEventListener('keyup', function(evt) {
@@ -112,5 +167,8 @@
   removeAssets();
   resetStyles();
   resetScripts();
+  resetHtml();
+  resetFonts();
+  runTests();
 
 })();
