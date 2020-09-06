@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PROJECT_NAME
 // @namespace    http://tampermonkey.net/
-// @version      0.7.3
+// @version      0.7.4
 // @description  Insert custom CSS and JS
 // @author       maurice.vancreij@webqem.com
 // @match        https://*.PROJECT_WEBSITE.com/*
@@ -114,7 +114,9 @@
   function resetHtml() {
     var htmlRequest;
     var htmlContainer;
-    var htmlResolver = function(container, evt) { container.innerHTML = evt.target.responseText; };
+    var htmlResolver = function(container, evt) {
+      container.innerHTML = evt.target.responseText.replace(/{url}/g, localUrl);
+    };
     // for all html includes
     for (var a = 0, b = htmlIncludes.length; a < b; a += 1) {
       // fetch the component
