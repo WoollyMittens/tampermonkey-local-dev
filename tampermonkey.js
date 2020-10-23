@@ -21,10 +21,14 @@
 
   const localUrl = 'http://localhost/PATH_TO_THIS_FOLDER/';
   const removeThese = 'link[href*="existing.css"]';
-  const styleIncludes = ['less/styles.less'];
-  const scriptIncludes = ['js/scripts.js'];
+  const styleIncludes = [
+    'less/local.less'
+  ];
+  const scriptIncludes = [
+    'js/local.js'
+  ];
   const htmlIncludes = [{
-    'url': 'html/component.html',
+    'url': 'html/local.html',
     'container': '#container'
   }];
   const webfontIncludes = [
@@ -114,17 +118,25 @@
   function resetHtml() {
     var htmlRequest;
     var htmlContainer;
-    var htmlResolver = function(container, evt) {
-      container.innerHTML = evt.target.responseText.replace(/{url}/g, localUrl);
+    var htmlResolve = function(container, evt) {
+      // process the html
+      var importedHTML = evt.target.responseText;
+      importedHTML = importedHTML.split(/<!-- CUT FROM HERE -->|<!-- CUT TO HERE -->|<!-- CUT HERE -->/);
+      importedHTML = (importedHTML.length > 1) ? importedHTML[1] : importedHTML[0];
+      importedHTML = importedHTML.replace(/\.\.\//g, localUrl)
+      // insert it into the page
+      container.innerHTML = importedHTML;
     };
     // for all html includes
     for (var a = 0, b = htmlIncludes.length; a < b; a += 1) {
       // fetch the component
-      htmlRequest = new XMLHttpRequest();
       htmlContainer = document.querySelector(htmlIncludes[a].container);
-      htmlRequest.addEventListener("load", htmlResolver.bind(this, htmlContainer));
-      htmlRequest.open("GET", localUrl + htmlIncludes[a].url + '?t=' + new Date().getTime());
-      htmlRequest.send();
+      if (htmlContainer) {
+        htmlRequest = new XMLHttpRequest();
+        htmlRequest.addEventListener("load", htmlResolve.bind(this, htmlContainer));
+        htmlRequest.open("GET", localUrl + htmlIncludes[a].url + '?t=' + new Date().getTime());
+        htmlRequest.send();
+      }
     }
   };
 
@@ -163,6 +175,7 @@
       // re-apply the includes
       resetStyles();
       resetScripts();
+      resetHtml();
     }
   });
 
