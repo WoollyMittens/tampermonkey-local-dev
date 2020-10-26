@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PROJECT_NAME
 // @namespace    http://tampermonkey.net/
-// @version      0.7.4
+// @version      0.7.5
 // @description  Insert custom CSS and JS
 // @author       maurice.vancreij@webqem.com
 // @match        https://*.PROJECT_WEBSITE.com/*
@@ -20,24 +20,18 @@
   // PROPERTIES
 
   const localUrl = 'http://localhost/PATH_TO_THIS_FOLDER/';
+  const remotePath = '../';
   const removeThese = 'link[href*="existing.css"]';
-  const styleIncludes = [
-    'less/local.less'
-  ];
-  const scriptIncludes = [
-    'js/local.js'
-  ];
-  const htmlIncludes = [{
-    'url': 'html/local.html',
-    'container': '#container'
-  }];
+  const styleIncludes = ['less/local.less'];
+  const scriptIncludes = ['js/local.js'];
+  const htmlIncludes = ['html/local.html -> #container'];
   const webfontIncludes = [
     'https://use.typekit.net/TYPEKIT_FONTS.css',
     'https://fonts.googleapis.com/css?family=GOOGLE_FONTS',
     'https://kit.fontawesome.com/ICON_FONT.js'
   ];
-  const compileBefore = true;
-  const compileAfter = (!compileBefore && /.less/.test(styleIncludes.join(',')));
+  const compileFirst = true;
+  const compileLast = (!compileFirst && /.less/.test(styleIncludes.join(',')));
 
   // METHODS
 
@@ -60,13 +54,13 @@
   };
 
   function createStyle(path) {
-    var href = (compileBefore ? localUrl + 'php/{type}.php?path=../{path}&t={t}' : localUrl + '{path}?t={t}')
+    var href = (compileFirst ? localUrl + 'php/{type}.php?path=../{path}&t={t}' : localUrl + '{path}?t={t}')
       .replace('{type}', path.split('.').pop())
       .replace('{path}', path)
       .replace('{t}', new Date().getTime());
     // generate a replacement stylesheet
     var link = document.createElement('link');
-    link.setAttribute('rel', (compileAfter) ? 'stylesheet/less' : 'stylesheet');
+    link.setAttribute('rel', (compileLast) ? 'stylesheet/less' : 'stylesheet');
     link.setAttribute('type', 'text/css');
     link.setAttribute('href', href);
     // return a reference
@@ -74,7 +68,7 @@
   };
 
   function createScript(path) {
-    var src = (compileBefore ? localUrl + 'php/{type}.php?path=../{path}&t={t}' : localUrl + '{path}?t={t}')
+    var src = (compileFirst ? localUrl + 'php/{type}.php?path=../{path}&t={t}' : localUrl + '{path}?t={t}')
       .replace('{type}', path.split('.').pop())
       .replace('{path}', path)
       .replace('{t}', new Date().getTime());
@@ -100,7 +94,7 @@
       else { document.getElementsByTagName('head')[0].appendChild(style) };
     }
     // if any of the files where LESS
-    if (compileAfter) compileLess();
+    if (compileLast) compileLess();
   };
 
   function resetScripts() {
@@ -116,25 +110,28 @@
   };
 
   function resetHtml() {
+    var htmlPath;
     var htmlRequest;
     var htmlContainer;
     var htmlResolve = function(container, evt) {
       // process the html
       var importedHTML = evt.target.responseText;
+      var replaceUrl = new RegExp(remotePath.replace(/\//g, '\/').replace(/\./g, '\.'), 'gi');
       importedHTML = importedHTML.split(/<!-- CUT FROM HERE -->|<!-- CUT TO HERE -->|<!-- CUT HERE -->/);
       importedHTML = (importedHTML.length > 1) ? importedHTML[1] : importedHTML[0];
-      importedHTML = importedHTML.replace(/\.\.\//g, localUrl)
+      importedHTML = importedHTML.replace(replaceUrl, localUrl)
       // insert it into the page
       container.innerHTML = importedHTML;
     };
     // for all html includes
     for (var a = 0, b = htmlIncludes.length; a < b; a += 1) {
       // fetch the component
-      htmlContainer = document.querySelector(htmlIncludes[a].container);
+      htmlPath = htmlIncludes[a].split(' -> ');
+      htmlContainer = document.querySelector(htmlPath[1]);
       if (htmlContainer) {
         htmlRequest = new XMLHttpRequest();
         htmlRequest.addEventListener("load", htmlResolve.bind(this, htmlContainer));
-        htmlRequest.open("GET", localUrl + htmlIncludes[a].url + '?t=' + new Date().getTime());
+        htmlRequest.open("GET", localUrl + htmlPath[0] + '?t=' + new Date().getTime());
         htmlRequest.send();
       }
     }
@@ -171,7 +168,7 @@
   window.addEventListener('keyup', function(evt) {
     if (evt.key === '`') {
       // reload the page if on the fly less compilation was used
-      if (compileAfter) { document.location.reload(); return null; }
+      if (compileLast) { document.location.reload(); return null; }
       // re-apply the includes
       resetStyles();
       resetScripts();

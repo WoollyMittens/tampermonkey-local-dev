@@ -56,13 +56,11 @@ Edit the following constants in the "tampermonkey.js" to reflect your localhost:
 
 ```javascript
 const localUrl = 'http://localhost/PATH_TO_THE_LOCAL_FILES/';
+const remotePath = '../';
 const removeThese = 'link[href*="existing.css"]';
 const styleIncludes = ['less/styles.less'];
 const scriptIncludes = ['js/scripts.js'];
-const htmlIncludes = [{
-  'url': 'html/component.html',
-  'container': '#container'
-}];
+const htmlIncludes = ['html/component.html -> #container'];
 const webfontIncludes = [
   'https://use.typekit.net/TYPEKIT_FONTS.css',
   'https://fonts.googleapis.com/css?family=GOOGLE_FONTS',
@@ -75,6 +73,7 @@ In the simple case of changing existing styles in a local repository:
 
 ```javascript
 const localUrl = 'http://localhost/project-repository/';
+const remotePath = '../';
 const removeThese = 'link[href*="theme.min.css"]';
 const styleIncludes = ['styles/theme.less'];
 const scriptIncludes = [];
@@ -87,10 +86,11 @@ Or the advanced case of additional components that need to be compiled and/or in
 
 ```javascript
 const localUrl = 'http://localhost/tampermonkey-local-dev/';
+const remotePath = '../';
 const removeThese = null;
 const styleIncludes = ['less/local.less'];
 const scriptIncludes = ['js/local.js'];
-const htmlIncludes = [{'url': 'html/local.html', 'container': '#container'}];
+const htmlIncludes = ['html/local.html -> #container'];
 const webfontIncludes = ['https://kit.fontawesome.com/8254db13d2.js'];
 const compileFirst = true;
 ```
