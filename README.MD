@@ -57,7 +57,7 @@ Edit the following constants in the "tampermonkey.js" to reflect your localhost:
 ```javascript
 const localUrl = 'http://localhost/PATH_TO_THE_LOCAL_FILES/';
 const remotePath = '../';
-const removeThese = 'link[href*="existing.css"]';
+const removeThese = ['link[href*="existing.css"]'];
 const styleIncludes = ['less/styles.less'];
 const scriptIncludes = ['js/scripts.js'];
 const htmlIncludes = ['html/component.html -> #container'];
@@ -74,7 +74,7 @@ In the simple case of changing existing styles in a local repository:
 ```javascript
 const localUrl = 'http://localhost/project-repository/';
 const remotePath = '../';
-const removeThese = 'link[href*="theme.min.css"]';
+const removeThese = ['link[href*="theme.min.css"]'];
 const styleIncludes = ['styles/theme.less'];
 const scriptIncludes = [];
 const htmlIncludes = [];

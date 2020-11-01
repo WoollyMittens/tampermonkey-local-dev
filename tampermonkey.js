@@ -21,7 +21,9 @@
 
   const localUrl = 'http://localhost/PATH_TO_THIS_FOLDER/';
   const remotePath = '../';
-  const removeThese = 'link[href*="existing.css"]';
+  const removeThese = [
+    'link[href*="existing.css"]'
+  ];
   const styleIncludes = ['less/local.less'];
   const scriptIncludes = ['js/local.js'];
   const htmlIncludes = ['html/local.html -> #container'];
@@ -37,9 +39,9 @@
 
   function removeAssets() {
     // stop if there's nothing to remove
-    if (!removeThese) return null;
+    if (!removeThese.length > 0) return null;
     // remove all matched assets
-    var oldAssets = document.querySelectorAll(removeThese);
+    var oldAssets = document.querySelectorAll(removeThese.join(','));
     for (var a = 0, b = oldAssets.length; a < b; a += 1) {
       oldAssets[a].parentNode.removeChild(oldAssets[a]);
     }
