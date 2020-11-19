@@ -1,11 +1,12 @@
 // ==UserScript==
 // @name         PROJECT_NAME
 // @namespace    http://tampermonkey.net/
-// @version      0.7.5
-// @description  Insert custom CSS and JS
+// @version      0.7.6
+// @description  Insert custom CSS, JS, and HTML
 // @author       maurice.vancreij@webqem.com
 // @match        https://*.PROJECT_WEBSITE.com/*
-// @grant        none
+// @grant        GM_xmlhttpRequest
+// @connect      localhost
 // ==/UserScript==
 
 (function() {
@@ -21,12 +22,10 @@
 
   const localUrl = 'http://localhost/PATH_TO_THIS_FOLDER/';
   const remotePath = '../';
-  const removeThese = [
-    'link[href*="existing.css"]'
-  ];
   const styleIncludes = ['less/local.less'];
   const scriptIncludes = ['js/local.js'];
   const htmlIncludes = ['html/local.html -> #container'];
+  const htmlRemovals = ['#source .elements -> #destination'];
   const webfontIncludes = [
     'https://use.typekit.net/TYPEKIT_FONTS.css',
     'https://fonts.googleapis.com/css?family=GOOGLE_FONTS',
@@ -38,13 +37,20 @@
   // METHODS
 
   function removeAssets() {
-    // stop if there's nothing to remove
-    if (!removeThese.length > 0) return null;
-    // remove all matched assets
-    var oldAssets = document.querySelectorAll(removeThese.join(','));
-    for (var a = 0, b = oldAssets.length; a < b; a += 1) {
-      oldAssets[a].parentNode.removeChild(oldAssets[a]);
-    }
+    // for all removals
+    htmlRemovals.map(function(rule) {
+      // parse the rule
+      var parts = rule.split(' -> ');
+      var sources = Array.prototype.slice.call(document.querySelectorAll(parts[0]));
+      var destination = (parts.length > 1) ? document.querySelector(parts[1]) : null;
+      console.log(sources);
+      // (re)move the source to the destination
+      sources.map(function(source) {
+        var element = (destination) ?
+          destination.appendChild(source):
+          source.parentNode.removeChild(source);
+      });
+    });
   };
 
   function compileLess() {
@@ -61,6 +67,7 @@
       .replace('{path}', path)
       .replace('{t}', new Date().getTime());
     // generate a replacement stylesheet
+// TODO: fetch using GM_xmlhttpRequest and insert inline
     var link = document.createElement('link');
     link.setAttribute('rel', (compileLast) ? 'stylesheet/less' : 'stylesheet');
     link.setAttribute('type', 'text/css');
@@ -117,11 +124,11 @@
     var htmlContainer;
     var htmlResolve = function(container, evt) {
       // process the html
-      var importedHTML = evt.target.responseText;
-      var replaceUrl = new RegExp(remotePath.replace(/\//g, '\/').replace(/\./g, '\.'), 'gi');
+      var importedHTML = evt.responseText || evt.target.responseText;
+      var replaceUrl = new RegExp(remotePath.replace(/\//g, '\\/').replace(/\./g, '\\.'), 'gi');
       importedHTML = importedHTML.split(/<!-- CUT FROM HERE -->|<!-- CUT TO HERE -->|<!-- CUT HERE -->/);
       importedHTML = (importedHTML.length > 1) ? importedHTML[1] : importedHTML[0];
-      importedHTML = importedHTML.replace(replaceUrl, localUrl)
+      importedHTML = importedHTML.replace(replaceUrl, localUrl);
       // insert it into the page
       container.innerHTML = importedHTML;
     };
@@ -131,10 +138,19 @@
       htmlPath = htmlIncludes[a].split(' -> ');
       htmlContainer = document.querySelector(htmlPath[1]);
       if (htmlContainer) {
-        htmlRequest = new XMLHttpRequest();
-        htmlRequest.addEventListener("load", htmlResolve.bind(this, htmlContainer));
-        htmlRequest.open("GET", localUrl + htmlPath[0] + '?t=' + new Date().getTime());
-        htmlRequest.send();
+// TODO: make helper fething function
+        if (GM_xmlhttpRequest) {
+          GM_xmlhttpRequest({
+            method: 'GET',
+            url: localUrl + htmlPath[0] + '?t=' + new Date().getTime(),
+            onload: htmlResolve.bind(this, htmlContainer)
+          });
+        } else {
+          htmlRequest = new XMLHttpRequest();
+          htmlRequest.addEventListener("load", htmlResolve.bind(this, htmlContainer));
+          htmlRequest.open("GET", localUrl + htmlPath[0] + '?t=' + new Date().getTime());
+          htmlRequest.send();
+        }
       }
     }
   };
