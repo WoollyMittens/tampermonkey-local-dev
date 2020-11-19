@@ -80,6 +80,7 @@
         method: 'GET',
         url: href + '?t=' + new Date().getTime(),
         onload: function(evt) {
+          if (evt.status !== 200) { console.log('error retrieving css:', evt); return null; };
           var css = evt.responseText || evt.target.responseText;
           link.innerHTML = css.replace(new RegExp(remotePath.replace(/\//g, '\\/').replace(/\./g, '\\.'), 'gi'), localUrl);
         }
@@ -141,6 +142,7 @@
     var htmlRequest;
     var htmlContainer;
     var htmlResolve = function(container, evt) {
+      if (evt.status !== 200) { console.log('error retrieving html:', evt); return null; };
       // process the html
       var importedHTML = evt.responseText || evt.target.responseText;
       importedHTML = importedHTML.split(/<!-- CUT FROM HERE -->|<!-- CUT TO HERE -->|<!-- CUT HERE -->/);
