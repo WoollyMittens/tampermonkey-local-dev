@@ -58,8 +58,8 @@ Edit the following constants in the "tampermonkey.js" to reflect your localhost:
 ```javascript
 const localUrl = 'http://localhost/PATH_TO_THIS_FOLDER/';
 const remotePath = '../';
-const styleIncludes = ['less/local.less'];
 const scriptIncludes = ['js/local.js'];
+const styleIncludes = ['less/local.less -> screen'];
 const htmlIncludes = ['html/local.html -> #container'];
 const htmlRemovals = ['#source .elements -> #destination'];
 const webfontIncludes = [
@@ -75,8 +75,8 @@ In the simple case of swapping an online stylesheet with a local one:
 ```javascript
 const localUrl = 'http://localhost/project-repository/';
 const remotePath = '../';
-const styleIncludes = ['styles/theme.css'];
 const scriptIncludes = [];
+const styleIncludes = ['styles/theme.css'];
 const htmlIncludes = [];
 const htmlRemovals = ['link[href*="theme.css"]'];
 const webfontIncludes = [];
@@ -88,8 +88,8 @@ Or the advanced case of additional components that need to be compiled, moved, a
 ```javascript
 const localUrl = 'http://localhost/tampermonkey-local-dev/';
 const remotePath = '../';
-const styleIncludes = ['less/local.less'];
 const scriptIncludes = ['js/local.js'];
+const styleIncludes = ['less/local.less -> screen and (min-width:992px)'];
 const htmlIncludes = ['html/local.html -> #container'];
 const htmlRemovals = ['#source .elements -> #destination'];
 const webfontIncludes = ['https://kit.fontawesome.com/8254db13d2.js'];

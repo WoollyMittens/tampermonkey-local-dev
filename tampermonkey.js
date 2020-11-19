@@ -22,8 +22,8 @@
 
   const localUrl = 'http://localhost/PATH_TO_THIS_FOLDER/';
   const remotePath = '../';
-  const styleIncludes = ['less/local.less'];
   const scriptIncludes = ['js/local.js'];
+  const styleIncludes = ['less/local.less -> screen'];
   const htmlIncludes = ['html/local.html -> #container'];
   const htmlRemovals = ['#source .elements -> #destination'];
   const webfontIncludes = [
@@ -61,17 +61,35 @@
     document.getElementsByTagName('head')[0].appendChild(Less);
   };
 
-  function createStyle(path) {
+  function createStyle(include) {
+    // seperate any conditions
+    include = include.split(' -> ');
+    var path = include[0];
+    var media = (include.length === 1) ? '' : include.pop();
+    // generate the path
     var href = (compileFirst ? localUrl + 'php/{type}.php?path=../{path}&t={t}' : localUrl + '{path}?t={t}')
       .replace('{type}', path.split('.').pop())
       .replace('{path}', path)
       .replace('{t}', new Date().getTime());
     // generate a replacement stylesheet
-// TODO: fetch using GM_xmlhttpRequest and insert inline
-    var link = document.createElement('link');
-    link.setAttribute('rel', (compileLast) ? 'stylesheet/less' : 'stylesheet');
-    link.setAttribute('type', 'text/css');
-    link.setAttribute('href', href);
+    var link = (GM_xmlhttpRequest) ? document.createElement('style') : document.createElement('link');
+    link.setAttribute('media', media);
+    // fill the replacement stylesheet
+    if (GM_xmlhttpRequest) {
+      GM_xmlhttpRequest({
+        method: 'GET',
+        url: href + '?t=' + new Date().getTime(),
+        onload: function(evt) {
+          var css = evt.responseText || evt.target.responseText;
+          link.innerHTML = css.replace(new RegExp(remotePath.replace(/\//g, '\\/').replace(/\./g, '\\.'), 'gi'), localUrl);
+        }
+      });
+      link.setAttribute('data-href', href);
+    } else {
+      link.setAttribute('rel', (compileLast) ? 'stylesheet/less' : 'stylesheet');
+      link.setAttribute('type', 'text/css');
+      link.setAttribute('href', href);
+    }
     // return a reference
     return link;
   };
@@ -97,7 +115,7 @@
       // create the new include
       style = createStyle(href);
       // find a possible existing one
-      existing = document.querySelector('link[href*="' + href + '"]');
+      existing = document.querySelector('link[href*="' + href + '"],style[data-href*="' + href + '"]');
       // replace or insert the include
       if (existing) { existing.parentNode.replaceChild(style, existing) }
       else { document.getElementsByTagName('head')[0].appendChild(style) };
@@ -125,10 +143,9 @@
     var htmlResolve = function(container, evt) {
       // process the html
       var importedHTML = evt.responseText || evt.target.responseText;
-      var replaceUrl = new RegExp(remotePath.replace(/\//g, '\\/').replace(/\./g, '\\.'), 'gi');
       importedHTML = importedHTML.split(/<!-- CUT FROM HERE -->|<!-- CUT TO HERE -->|<!-- CUT HERE -->/);
       importedHTML = (importedHTML.length > 1) ? importedHTML[1] : importedHTML[0];
-      importedHTML = importedHTML.replace(replaceUrl, localUrl);
+      importedHTML = importedHTML.replace(new RegExp(remotePath.replace(/\//g, '\\/').replace(/\./g, '\\.'), 'gi'), localUrl);
       // insert it into the page
       container.innerHTML = importedHTML;
     };
@@ -138,7 +155,6 @@
       htmlPath = htmlIncludes[a].split(' -> ');
       htmlContainer = document.querySelector(htmlPath[1]);
       if (htmlContainer) {
-// TODO: make helper fething function
         if (GM_xmlhttpRequest) {
           GM_xmlhttpRequest({
             method: 'GET',
