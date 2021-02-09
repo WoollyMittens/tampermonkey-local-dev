@@ -58,7 +58,7 @@ Edit the following constants in the "tampermonkey.js" to reflect your localhost:
 ```javascript
 const localUrl = 'http://localhost/PATH_TO_THIS_FOLDER/';
 const remotePath = '../';
-const scriptIncludes = ['js/local.js'];
+const scriptIncludes = ['js/local.js -> head'];
 const styleIncludes = ['less/local.less -> screen'];
 const htmlIncludes = ['html/local.html -> #container'];
 const htmlRemovals = ['#source .elements -> #destination'];
@@ -88,7 +88,7 @@ Or the advanced case of additional components that need to be compiled, moved, a
 ```javascript
 const localUrl = 'http://localhost/tampermonkey-local-dev/';
 const remotePath = '../';
-const scriptIncludes = ['js/local.js'];
+const scriptIncludes = ['js/local.js -> body'];
 const styleIncludes = ['less/local.less -> screen and (min-width:992px)'];
 const htmlIncludes = ['html/local.html -> #container'];
 const htmlRemovals = ['#source .elements -> #destination'];

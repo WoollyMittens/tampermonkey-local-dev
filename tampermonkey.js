@@ -22,7 +22,7 @@
 
   const localUrl = 'http://localhost/PATH_TO_THIS_FOLDER/';
   const remotePath = '../';
-  const scriptIncludes = ['js/local.js'];
+  const scriptIncludes = ['js/local.js -> body'];
   const styleIncludes = ['less/local.less -> screen'];
   const htmlIncludes = ['html/local.html -> #container'];
   const htmlRemovals = ['#source .elements -> #destination'];
@@ -33,6 +33,7 @@
   ];
   const compileFirst = true;
   const compileLast = (!compileFirst && /.less/.test(styleIncludes.join(',')));
+  const useGmApi = (typeof GM_xmlhttpRequest !== 'undefined');
 
   // METHODS
 
@@ -72,10 +73,10 @@
       .replace('{path}', path)
       .replace('{t}', new Date().getTime());
     // generate a replacement stylesheet
-    var link = (GM_xmlhttpRequest) ? document.createElement('style') : document.createElement('link');
+    var link = (useGmApi) ? document.createElement('style') : document.createElement('link');
     link.setAttribute('media', media);
     // fill the replacement stylesheet
-    if (GM_xmlhttpRequest) {
+    if (useGmApi) {
       GM_xmlhttpRequest({
         method: 'GET',
         url: href + '?t=' + new Date().getTime(),
@@ -115,6 +116,7 @@
       href = styleIncludes[a];
       // create the new include
       style = createStyle(href);
+      href= href.split(' ')[0];
       // find a possible existing one
       existing = document.querySelector('link[href*="' + href + '"],style[data-href*="' + href + '"]');
       // replace or insert the include
@@ -126,14 +128,16 @@
   };
 
   function resetScripts() {
-    var src, script;
+    var src, script, destination;
     // for all stylesheets
     for (var a = 0, b = scriptIncludes.length; a < b; a += 1) {
-      src = scriptIncludes[a];
+      src = scriptIncludes[a].split(' -> ');
+      // locate the destination
+      destination = (src.length === 1) ? 'head' : src.pop();
       // create the new include
-      script = createScript(src);
+      script = createScript(src[0]);
       // insert the include
-      document.getElementsByTagName('head')[0].appendChild(script);
+      document.querySelector(destination).appendChild(script);
     }
   };
 
@@ -145,9 +149,12 @@
       if (evt.status !== 200) { console.log('error retrieving html:', evt); return null; };
       // process the html
       var importedHTML = evt.responseText || evt.target.responseText;
+      var replaceTemplateStart = new RegExp('\{\{media url=&quot;', 'gi');
+      var replaceTemplateEnd = new RegExp('&quot;\}\}', 'gi');
+      var replaceUrl = new RegExp(remotePath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
       importedHTML = importedHTML.split(/<!-- CUT FROM HERE -->|<!-- CUT TO HERE -->|<!-- CUT HERE -->/);
       importedHTML = (importedHTML.length > 1) ? importedHTML[1] : importedHTML[0];
-      importedHTML = importedHTML.replace(new RegExp(remotePath.replace(/\//g, '\\/').replace(/\./g, '\\.'), 'gi'), localUrl);
+      importedHTML = importedHTML.replace(replaceTemplateStart, '../').replace(replaceTemplateEnd, '').replace(replaceUrl, localUrl);
       // insert it into the page
       container.innerHTML = importedHTML;
     };
@@ -157,7 +164,7 @@
       htmlPath = htmlIncludes[a].split(' -> ');
       htmlContainer = document.querySelector(htmlPath[1]);
       if (htmlContainer) {
-        if (GM_xmlhttpRequest) {
+        if (useGmApi) {
           GM_xmlhttpRequest({
             method: 'GET',
             url: localUrl + htmlPath[0] + '?t=' + new Date().getTime(),
