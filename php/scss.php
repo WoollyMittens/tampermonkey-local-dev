@@ -1,7 +1,7 @@
 <?php
 
 /*
-  http://localhost/~mauricevancreij/Tampermonkey/tampermonkey-local-dev/php/scss2css.php?path=../../../Tampermonkey/tampermonkey-local-dev/scss/styles.scss
+  http://localhost/Tampermonkey/tampermonkey-local-dev/php/scss.php?path=../scss/local.scss
 */
 
 header("Content-type: text/css", true);
@@ -13,6 +13,8 @@ use ScssPhp\ScssPhp\Compiler;
 $scss = new Compiler();
 
 $scss->setFormatter("ScssPhp\ScssPhp\Formatter\Expanded");
+
+$scss->setSourceMap(Compiler::SOURCE_MAP_INLINE);
 
 $scss->setLineNumberStyle(Compiler::LINE_COMMENTS);
 

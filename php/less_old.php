@@ -8,12 +8,10 @@ header("Content-type: text/css", true);
 
 require "./lessphp/lessc.inc.php";
 
-$options = array('sourceMap' => true);
+$less = new lessc;
 
-$parser = new Less_Parser($options);
+$less->setFormatter("lessjs");
 
-$parser->parseFile(@$_REQUEST['path']);
-
-echo  $parser->getCss();
+echo $less->compileFile(@$_REQUEST['path']);
 
 ?>
