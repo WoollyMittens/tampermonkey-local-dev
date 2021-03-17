@@ -14,6 +14,6 @@ $parser = new Less_Parser($options);
 
 $parser->parseFile(@$_REQUEST['path']);
 
-echo  $parser->getCss();
+echo  str_replace("../less/", "../", $parser->getCss());
 
 ?>

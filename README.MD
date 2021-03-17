@@ -87,7 +87,7 @@ Or the advanced case of additional components that need to be compiled, moved, a
 
 ```javascript
 const localUrl = 'http://localhost/tampermonkey-local-dev/';
-const remotePath = '../';
+const remotePath = /\.\.\//gi;
 const scriptIncludes = ['js/local.js -> body'];
 const styleIncludes = ['less/local.less -> screen and (min-width:992px)'];
 const htmlIncludes = ['html/local.html -> #container'];

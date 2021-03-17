@@ -21,7 +21,7 @@
   // PROPERTIES
 
   const localUrl = 'http://localhost/PATH_TO_THIS_FOLDER/';
-  const remotePath = '../';
+  const remotePath = /\.\.\//gi;
   const scriptIncludes = ['js/local.js -> body'];
   const styleIncludes = ['less/local.less -> screen'];
   const htmlIncludes = ['html/local.html -> #container'];
@@ -83,7 +83,7 @@
         onload: function(evt) {
           if (evt.status !== 200) { console.log('error retrieving css:', evt); return null; };
           var css = evt.responseText || evt.target.responseText;
-          link.innerHTML = css.replace(new RegExp(remotePath.replace(/\//g, '\\/').replace(/\./g, '\\.'), 'gi'), localUrl);
+          link.innerHTML = css.replace(remotePath, localUrl);
         }
       });
       link.setAttribute('data-href', href);
@@ -149,12 +149,9 @@
       if (evt.status !== 200) { console.log('error retrieving html:', evt); return null; };
       // process the html
       var importedHTML = evt.responseText || evt.target.responseText;
-      var replaceTemplateStart = new RegExp('\{\{media url=&quot;', 'gi');
-      var replaceTemplateEnd = new RegExp('&quot;\}\}', 'gi');
-      var replaceUrl = new RegExp(remotePath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
       importedHTML = importedHTML.split(/<!-- CUT FROM HERE -->|<!-- CUT TO HERE -->|<!-- CUT HERE -->/);
       importedHTML = (importedHTML.length > 1) ? importedHTML[1] : importedHTML[0];
-      importedHTML = importedHTML.replace(replaceTemplateStart, '../').replace(replaceTemplateEnd, '').replace(replaceUrl, localUrl);
+      importedHTML = importedHTML.replace(remotePath, localUrl);
       // insert it into the page
       container.innerHTML = importedHTML;
     };
