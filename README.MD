@@ -1,4 +1,4 @@
-# Local Development with TamperMonkey
+# Cross-domain live updates.
 
 This TamperMonkey script compiles the .less files in a local Mura or Magento repository and previews the result on a production or staging server immediately without the need for a local database or working dev environment.
 

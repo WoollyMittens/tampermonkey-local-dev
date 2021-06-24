@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PROJECT_NAME
 // @namespace    http://tampermonkey.net/
-// @version      0.7.6
+// @version      0.7.7
 // @description  Insert custom CSS, JS, and HTML
 // @author       maurice.vancreij@webqem.com
 // @match        https://*.PROJECT_WEBSITE.com/*
