@@ -20,5 +20,5 @@ function myComponent($, override) {
 
 }
 
-if (window.tampered){ myComponent(jQuery, true); }
+if (window.tm_develop){ myComponent(jQuery, true); }
 else { define(["jquery"], myComponent); }

@@ -15,8 +15,7 @@
 
   // CONDITIONS
 
-  if (/admin/.test(document.location.href)){ return false; }
-  else { window.tampered = true; }
+  if (/admin/.test(document.location.href)) return false;
 
   // PROPERTIES
 
@@ -25,7 +24,7 @@
   const scriptIncludes = ['js/local.js -> body'];
   const styleIncludes = ['less/local.less -> screen'];
   const htmlIncludes = ['html/local.html -> #container'];
-  const htmlRemovals = ['#source .elements -> #destination'];
+  const htmlRemovals = ['.inserted-content -> #destination'];
   const webfontIncludes = [
     'https://use.typekit.net/TYPEKIT_FONTS.css',
     'https://fonts.googleapis.com/css?family=GOOGLE_FONTS',
@@ -110,15 +109,16 @@
   };
 
   function resetStyles() {
-    var href, style, existing;
+    var fname, href, style, existing;
     // for all stylesheets
     for (var a = 0, b = styleIncludes.length; a < b; a += 1) {
       href = styleIncludes[a];
       // create the new include
       style = createStyle(href);
       href= href.split(' ')[0];
+      fname = href.split("/").pop();
       // find a possible existing one
-      existing = document.querySelector('link[href*="' + href + '"],style[data-href*="' + href + '"]');
+      existing = document.querySelector('link[href*="' + fname + '"],style[data-href*="' + fname + '"]');
       // replace or insert the include
       if (existing) { existing.parentNode.replaceChild(style, existing) }
       else { document.getElementsByTagName('head')[0].appendChild(style) };
@@ -129,9 +129,11 @@
 
   function resetScripts() {
     var src, script, destination;
+    // add global script include
+    var includes = ['inlinemonkey.js -> body', ...scriptIncludes];
     // for all stylesheets
-    for (var a = 0, b = scriptIncludes.length; a < b; a += 1) {
-      src = scriptIncludes[a].split(' -> ');
+    for (var a = 0, b = includes.length; a < b; a += 1) {
+      src = includes[a].split(' -> ');
       // locate the destination
       destination = (src.length === 1) ? 'head' : src.pop();
       // create the new include
@@ -153,7 +155,9 @@
       importedHTML = (importedHTML.length > 1) ? importedHTML[1] : importedHTML[0];
       importedHTML = importedHTML.replace(remotePath, localUrl);
       // insert it into the page
-      container.innerHTML = importedHTML;
+      var template = document.createElement('template');
+      template.innerHTML = importedHTML;
+      container.appendChild(template.content);
     };
     // for all html includes
     for (var a = 0, b = htmlIncludes.length; a < b; a += 1) {
@@ -210,6 +214,7 @@
       // reload the page if on the fly less compilation was used
       if (compileLast) { document.location.reload(); return null; }
       // re-apply the includes
+      removeAssets();
       resetStyles();
       resetScripts();
       resetHtml();
