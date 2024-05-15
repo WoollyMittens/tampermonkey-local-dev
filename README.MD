@@ -1,5 +1,7 @@
 # Cross-domain live updates.
 
+DEPRECATION WARNING: This script has been deprecated in favour of this [simplified implementation](https://github.com/WoollyMittens/tampermonkey-quick-refresh).
+
 This TamperMonkey script compiles the .less files in a local Mura or Magento repository and previews the result on a production or staging server immediately without the need for a local database or working dev environment.
 
 ## 1. Install TamperMonkey extention in your browser
